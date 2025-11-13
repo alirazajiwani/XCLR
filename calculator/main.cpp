@@ -1,0 +1,40 @@
+#include "funclib.h"
+#include <iostream>
+using namespace std;
+
+int main() {
+    double num1, num2;
+    char op;
+    char choice;
+
+    cout << "=== Simple C++ Calculator ===" << endl;
+
+    do {
+        cout << "\nEnter first number: ";
+        cin >> num1;
+
+        cout << "Enter operator (+, -, *, /): ";
+        cin >> op;
+
+        cout << "Enter second number: ";
+        cin >> num2;
+
+        switch (op) {
+	    case '+': cout << "Result: " << add (num1, num2) << endl; break;
+            case '-': cout << "Result: " << sub (num1, num2) << endl; break;
+            case '*': cout << "Result: " << mul (num1, num2) << endl; break;
+            case '/': cout << "Result: " << divide (num1, num2) << endl; break;		      
+            default:
+                cout << "Invalid operator!" << endl;
+        }
+
+        cout << "\nDo you want to perform another calculation? (y/n): ";
+        cin >> choice;
+
+    } while (choice == 'y' || choice == 'Y');
+
+    cout << "\nExiting calculator. Goodbye!" << endl;
+
+    return 0;
+}
+
