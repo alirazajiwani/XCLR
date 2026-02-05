@@ -102,7 +102,7 @@ The verification environment uses a layered UVM-style approach:
 
 ### Test Results
 
-From simulation transcript:
+#### From simulation transcript:
 <img width="400" height="352" alt="Transcript" src="https://github.com/user-attachments/assets/d66f4fce-7c92-46f7-baa2-295abe77ee06" />
 
 
