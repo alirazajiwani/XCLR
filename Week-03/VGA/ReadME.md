@@ -19,10 +19,10 @@ A fully functional VGA controller implementation in SystemVerilog designed for F
   ├── vga_timing.sv           # VGA timing controller with FSM
   ├── frame_buffer.sv         # Frame buffer memory (160×100 pixels)
   ├── clock_divider.sv        # Clock frequency divider
-  └──  SourceImage.hex         # Image data in hexadecimal format (required)
+  └── SourceImage.hex         # Image data in hexadecimal format (required)
 ├──testbench/
   ├── vga_top_tb.sv           # Main testbench file
-  └──  vga_tb_package.sv       # Testbench package with classes and coverage
+  └── vga_tb_package.sv       # Testbench package with classes and coverage
 
 ```
 
@@ -44,7 +44,7 @@ A fully functional VGA controller implementation in SystemVerilog designed for F
 
 ### `vga_top`
 Top-level integration module connecting:
-- Clock divider (50 MHz → ~1.3 MHz)
+- Clock divider (50 MHz → ~1.3 MHz) for better observation over FPGA
 - VGA timing generator
 - Frame buffer
 - Output signal management
