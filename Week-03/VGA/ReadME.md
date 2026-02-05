@@ -103,7 +103,8 @@ The verification environment uses a layered UVM-style approach:
 ### Test Results
 
 From simulation transcript:
-<img width="1366" height="768" alt="Transcript" src="https://github.com/user-attachments/assets/f5527353-2e72-4285-acd4-dcbb48e1fac4" />
+<img width="400" height="352" alt="Transcript" src="https://github.com/user-attachments/assets/d66f4fce-7c92-46f7-baa2-295abe77ee06" />
+
 
 
 ## 📈 Simulation Results
@@ -116,7 +117,8 @@ The waveform shows:
 - **VGA_VS**: Vertical sync pulses (3 frames visible)
 - **VGA_BLANK_N**: Active video region indicator
 - **VGA_SYNC_N**: Tied to 0 (separate sync mode)
-<img width="1366" height="768" alt="Timing Diagram" src="https://github.com/user-attachments/assets/9d435d45-a8bd-410a-88ae-fc88f4a0d97b" />
+<img width="1244" height="187" alt="Timing Diagram" src="https://github.com/user-attachments/assets/0baaae81-9f1d-458d-b769-69b2addf967e" />
+
 
 ### Performance
 - **Simulation Time**: ~5 seconds for 3 complete frames
