@@ -1,10 +1,3 @@
-// ============================================================================
-// Layered Testbench for Sequence Detector (1011)
-// ============================================================================
-// This testbench follows a layered architecture similar to UVM methodology
-// Layers: Transaction -> Generator -> Driver -> DUT -> Monitor -> Scoreboard
-// ============================================================================
-
 `timescale 1ns/1ps
 
 // ============================================================================
@@ -623,15 +616,15 @@ module seq_detector_tb;
         env.run();
         
         // Test 1: Random stimulus
-        $display("\n[TEST 1] Running random stimulus test (200 transactions)...");
-        env.gen.run(200);
+        $display("\n[TEST 1] Running random stimulus test (300 transactions)...");
+        env.gen.run(300);
         
         // Reset between tests
         env.reset_dut();
         
         // Test 2: Directed target patterns
         $display("\n[TEST 2] Running directed target pattern test...");
-        env.gen.generate_target_pattern(10);
+        env.gen.generate_target_pattern(15);
         
         // Reset between tests
         env.reset_dut();
@@ -662,49 +655,284 @@ module seq_detector_tb;
         
         // Test 3d: All zeros
         begin
-            automatic bit seq4[] = '{0, 0, 0, 0, 0, 0, 0, 0};
+            automatic bit seq4[] = '{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             $display("  - Testing all zeros");
             env.gen.generate_directed_sequence(seq4);
         end
         
         // Test 3e: All ones
         begin
-            automatic bit seq5[] = '{1, 1, 1, 1, 1, 1, 1, 1};
+            automatic bit seq5[] = '{1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
             $display("  - Testing all ones");
             env.gen.generate_directed_sequence(seq5);
         end
         
         // Test 3f: Near-miss patterns
         begin
-            automatic bit seq6[] = '{1, 0, 1, 0}; // Near miss
+            automatic bit seq6[] = '{1, 0, 1, 0, 1, 0, 0, 1}; // Multiple near misses
             $display("  - Testing near-miss pattern (1010)");
             env.gen.generate_directed_sequence(seq6);
         end
         
-        // Reset test
-        $display("\n[TEST 4] Running reset test...");
+        // Test 3g: Multiple near-miss patterns
         begin
-            automatic bit seq_before_reset[] = '{1, 0, 1};
-            automatic bit seq_after_reset[] = '{1, 0, 1, 1};
-            
-            env.gen.generate_directed_sequence(seq_before_reset);
-            
-            // Wait for transactions to complete
-            repeat(3) @(posedge vif.clk);
-            
-            // Reset scoreboard first, then apply DUT reset
+            automatic bit seq7[] = '{1, 0, 0, 1, 1, 1, 1, 0}; // 1001, 0111
+            $display("  - Testing other near-miss patterns");
+            env.gen.generate_directed_sequence(seq7);
+        end
+        
+        // Test 3h: Exhaustive state transitions
+        begin
+            automatic bit seq8[] = '{0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1};
+            $display("  - Testing exhaustive transitions");
+            env.gen.generate_directed_sequence(seq8);
+        end
+        
+        // Test 3i: Pattern with leading zeros
+        begin
+            automatic bit seq9[] = '{0, 0, 0, 1, 0, 1, 1};
+            $display("  - Testing pattern with leading zeros");
+            env.gen.generate_directed_sequence(seq9);
+        end
+        
+        // Test 3j: Pattern with trailing zeros
+        begin
+            automatic bit seq10[] = '{1, 0, 1, 1, 0, 0, 0};
+            $display("  - Testing pattern with trailing zeros");
+            env.gen.generate_directed_sequence(seq10);
+        end
+        
+        // Reset test - Test at different states
+        $display("\n[TEST 4] Running comprehensive reset tests...");
+        
+        // Reset at S0
+        $display("  - Reset at S0");
+        begin
+            automatic bit seq_s0[] = '{0, 0};
+            env.gen.generate_directed_sequence(seq_s0);
+            repeat(2) @(posedge vif.clk);
             env.scb.reset();
-            
-            // Apply reset to DUT
             @(posedge vif.clk);
             vif.rst_n = 0;
             repeat(2) @(posedge vif.clk);
             vif.rst_n = 1;
             @(posedge vif.clk);
-            
-            // Continue with sequence
+        end
+        
+        // Reset at S1
+        $display("  - Reset at S1");
+        begin
+            automatic bit seq_s1[] = '{1};
+            env.gen.generate_directed_sequence(seq_s1);
+            repeat(2) @(posedge vif.clk);
+            env.scb.reset();
+            @(posedge vif.clk);
+            vif.rst_n = 0;
+            repeat(2) @(posedge vif.clk);
+            vif.rst_n = 1;
+            @(posedge vif.clk);
+        end
+        
+        // Reset at S2
+        $display("  - Reset at S2");
+        begin
+            automatic bit seq_s2[] = '{1, 0};
+            env.gen.generate_directed_sequence(seq_s2);
+            repeat(2) @(posedge vif.clk);
+            env.scb.reset();
+            @(posedge vif.clk);
+            vif.rst_n = 0;
+            repeat(2) @(posedge vif.clk);
+            vif.rst_n = 1;
+            @(posedge vif.clk);
+        end
+        
+        // Reset at S3
+        $display("  - Reset at S3");
+        begin
+            automatic bit seq_s3[] = '{1, 0, 1};
+            env.gen.generate_directed_sequence(seq_s3);
+            repeat(2) @(posedge vif.clk);
+            env.scb.reset();
+            @(posedge vif.clk);
+            vif.rst_n = 0;
+            repeat(2) @(posedge vif.clk);
+            vif.rst_n = 1;
+            @(posedge vif.clk);
+        end
+        
+        // Reset at S4 (detected state)
+        $display("  - Reset at S4 (detection state)");
+        begin
+            automatic bit seq_s4[] = '{1, 0, 1, 1};
+            env.gen.generate_directed_sequence(seq_s4);
+            repeat(2) @(posedge vif.clk);
+            env.scb.reset();
+            @(posedge vif.clk);
+            vif.rst_n = 0;
+            repeat(2) @(posedge vif.clk);
+            vif.rst_n = 1;
+            @(posedge vif.clk);
+        end
+        
+        // Continue after all resets
+        $display("  - Continue normal operation after resets");
+        begin
+            automatic bit seq_after_reset[] = '{1, 0, 1, 1, 0, 1, 0, 1, 1};
             env.gen.generate_directed_sequence(seq_after_reset);
         end
+        
+        // Test 5: Corner cases for Input/Output coverage
+        $display("\n[TEST 5] Running corner case tests for coverage...");
+        
+        // Ensure all state-input combinations
+        begin
+            automatic bit corner1[] = '{0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1};
+            $display("  - Testing state-input coverage patterns");
+            env.gen.generate_directed_sequence(corner1);
+        end
+        
+        // More random with balanced 0/1
+        $display("  - Additional random coverage test");
+        env.gen.run(50);
+        
+        // Test 6: Sequence variations
+        $display("\n[TEST 6] Running sequence variation tests...");
+        
+        // Triple overlapping
+        begin
+            automatic bit triple[] = '{1, 0, 1, 0, 1, 0, 1, 1};
+            $display("  - Testing triple overlapping possibility");
+            env.gen.generate_directed_sequence(triple);
+        end
+        
+        // Long sequence with multiple patterns
+        begin
+            automatic bit long_seq[] = '{1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1};
+            $display("  - Testing long sequence with multiple patterns");
+            env.gen.generate_directed_sequence(long_seq);
+        end
+        
+        // Test 7: Targeted Input/Output Coverage
+        $display("\n[TEST 7] Running targeted input/output coverage tests...");
+        
+        // Force all state-input combinations systematically
+        $display("  - Forcing all state-input combinations");
+        
+        // S0 with 0: Start with 0
+        begin
+            automatic bit s0_0[] = '{0};
+            env.gen.generate_directed_sequence(s0_0);
+        end
+        
+        // S0 with 1: Start with 1 to go to S1
+        begin
+            automatic bit s0_1[] = '{1};
+            env.gen.generate_directed_sequence(s0_1);
+        end
+        
+        // S1 with 1: Stay in S1
+        begin
+            automatic bit s1_1[] = '{1, 1};
+            env.gen.generate_directed_sequence(s1_1);
+        end
+        
+        // S1 with 0: Go to S2
+        begin
+            automatic bit s1_0[] = '{1, 0};
+            env.gen.generate_directed_sequence(s1_0);
+        end
+        
+        // S2 with 0: Go back to S0
+        begin
+            automatic bit s2_0[] = '{1, 0, 0};
+            env.gen.generate_directed_sequence(s2_0);
+        end
+        
+        // S2 with 1: Go to S3
+        begin
+            automatic bit s2_1[] = '{1, 0, 1};
+            env.gen.generate_directed_sequence(s2_1);
+        end
+        
+        // S3 with 0: Go to S2
+        begin
+            automatic bit s3_0[] = '{1, 0, 1, 0};
+            env.gen.generate_directed_sequence(s3_0);
+        end
+        
+        // S3 with 1: Go to S4 (DETECTED)
+        begin
+            automatic bit s3_1[] = '{1, 0, 1, 1};
+            env.gen.generate_directed_sequence(s3_1);
+        end
+        
+        // S4 with 0: Go to S2 (after detection)
+        begin
+            automatic bit s4_0[] = '{1, 0, 1, 1, 0};
+            env.gen.generate_directed_sequence(s4_0);
+        end
+        
+        // S4 with 1: Go to S1 (after detection)
+        begin
+            automatic bit s4_1[] = '{1, 0, 1, 1, 1};
+            env.gen.generate_directed_sequence(s4_1);
+        end
+        
+        // Test 8: Output coverage - Multiple detections
+        $display("\n[TEST 8] Running output coverage tests...");
+        $display("  - Multiple consecutive detections");
+        
+        // Multiple detections in sequence
+        begin
+            automatic bit multi_detect[] = '{1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1};
+            env.gen.generate_directed_sequence(multi_detect);
+        end
+        
+        // Detection followed by various patterns
+        begin
+            automatic bit detect_variations[] = '{
+                1, 0, 1, 1,  // Detect
+                0,           // S4->S2
+                1, 1,        // S2->S3->S4 Detect
+                1,           // S4->S1
+                0, 1, 1      // S1->S2->S3->S4 Detect
+            };
+            env.gen.generate_directed_sequence(detect_variations);
+        end
+        
+        // Ensure detection at S4 with different following patterns
+        begin
+            automatic bit s4_coverage[] = '{
+                1, 0, 1, 1,  // At S4 (detected=1)
+                0, 0,        // S4->S2->S0
+                1, 0, 1, 1,  // Detect again
+                1, 1         // S4->S1->S1
+            };
+            env.gen.generate_directed_sequence(s4_coverage);
+        end
+        
+        // Test 9: Comprehensive state coverage with outputs
+        $display("\n[TEST 9] Running comprehensive state-output coverage...");
+        
+        // Systematically visit each state multiple times
+        begin
+            automatic bit comprehensive[] = '{
+                0, 0, 0,           // S0 with output=0 multiple times
+                1, 1, 1,           // S0->S1, S1 with output=0 multiple times
+                0, 0,              // S1->S2, S2 with output=0
+                1,                 // S2->S3 with output=0
+                0, 1,              // S3->S2->S3 with output=0
+                1,                 // S3->S4 with output=1
+                0, 1, 1,           // S4->S2->S3->S4 with transitions
+                1, 0, 0, 1, 0, 1, 1  // More patterns
+            };
+            env.gen.generate_directed_sequence(comprehensive);
+        end
+        
+        // Additional random for any remaining holes
+        $display("  - Final random coverage sweep");
+        env.gen.run(100);
         
         // Post-test reports
         env.post_test();
@@ -722,6 +950,6 @@ module seq_detector_tb;
         $display("\n[ERROR] Simulation timeout!");
         $finish;
     end
+   
     
-
 endmodule
