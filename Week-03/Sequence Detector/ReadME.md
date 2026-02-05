@@ -109,6 +109,8 @@ S4 (DETECT)  -> Pattern '1011' detected! (output = 1)
 ## Output
 ### Transcript
 <img width="314" height="355" alt="Transcript" src="https://github.com/user-attachments/assets/296f529c-3e7a-46b1-96e8-8cff053872df" />
+
+
 ### Waveform
 <img width="1010" height="95" alt="Timing Diagram" src="https://github.com/user-attachments/assets/8feedeb3-840e-4b53-9317-0500a13fb9a3" />
 
